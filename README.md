@@ -50,7 +50,7 @@ records = qb_api.do_query( 'bdjwmnj33', query: "{3.EX.'123'}", clist: [3, 6, 10]
 **add\_record( db\_id, new\_data )** => **[int] New Record Id**
 
 ```ruby
-new_data = { 6 => 'Book', 7 => 'My New Title' 8 => 'John Smith'}
+new_data = { 6 => 'Book', 7 => 'My New Title', 8 => 'John Smith'}
 new_record_id = qb_api.add_record( 'abcd1234', new_data )
 ````
 
@@ -58,7 +58,7 @@ new_record_id = qb_api.add_record( 'abcd1234', new_data )
 **edit\_record( db\_id, record\_id, new\_data )** => **[bool] Success?**
 
 ```ruby
-new_data = { 7 => 'My Second Title' 8 => 'John Smith'}
+new_data = { 7 => 'My Second Title', 8 => 'John Smith'}
 call_successful = qb_api.edit_record( 'abcd1234', 136, new_data )
 ````
 
