@@ -11,7 +11,7 @@ qb_api = Advantage::QuickbaseAPI.new( 'ais', 'username', 'password' )
 books = qb_api.do_query( 'books_db_id', query: "{6.EX.'Book'}", clist: [7] )
 
 puts books.inspect
-# => [ {"7" => 'Lord of the Flies'}, {"7" => 'The Giver'} ]
+# => [ {"7" => "Lord of the Flies"}, {"7" => "The Giver"} ]
 ```
 
 ##API Documentation
