@@ -8,7 +8,7 @@ This gem is designed to be a concise, clear and maintainable collection of commo
 ###New Connection
 
 ```ruby
-qb\_api = Advantage::QuickbaseAPI.new( :app_domain, :username, :password )
+qb_api = Advantage::QuickbaseAPI.new( :app_domain, :username, :password )
 ```
 
 ###Do Query Count
@@ -16,7 +16,7 @@ qb\_api = Advantage::QuickbaseAPI.new( :app_domain, :username, :password )
 
 ```ruby
 today = Date.today.strftime( '%Y-%m-%d' )
-num\_records = qb\_api.do\_query\_count( 'abcd1234', "{1.EX.'#{today}'}" )
+num_records = qb_api.do_query_count( 'abcd1234', "{1.EX.'#{today}'}" )
 ````
 
 ###Do Query
