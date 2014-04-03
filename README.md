@@ -3,6 +3,16 @@
 This gem is designed to be a concise, clear and maintainable collection of common Quickbase API calls used in ruby development. It implements a subset of the total Quickbase API.
 
 ##Example
+```ruby
+# Create a new API connection
+qb_api = Advantage::QuickbaseAPI.new( 'ais', 'username', 'password' )
+
+# Load all of the Books in our table
+books = qb_api.do_query( 'books_db_id', query: "{6.EX.'Book'}", clist: [7] )
+
+puts books.inspect
+# => [ {"7" => 'Lord of the Flies'}, {"7" => 'The Giver'} ]
+```
 
 ##API Documentation
 ###New Connection
@@ -65,8 +75,8 @@ call_successful = qb_api.delete_record( 'abcd1234', 136 )
 ```ruby
 new_data = [
   ['Book', 'Lord of the Flies', 'William Golding'],
-  ['Book', 'Animal Farm', 'George Orwell'],
-  ['Book', 'A Tale of Two Cities', 'Charles Dickens']
+  ['Book', 'A Tale of Two Cities', 'Charles Dickens'],
+  ['Book', 'Animal Farm', 'George Orwell']
 ]
 record_ids = qb_api.import_from_csv( 'abcd1234', new_data, [6, 7, 8] )
 ````
