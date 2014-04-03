@@ -15,7 +15,7 @@ login_info = YAML.load_file( 'credentials.yml' )
 puts login_info.inspect
 
 print "Connect to Quickbase... "
-quickbase = Advantage::QuickbaseAPI.new( 'ais', login_info['username'], login_info['password'] )
+quickbase = Quickbase::API.new( 'ais', login_info['username'], login_info['password'] )
 puts "complete."
 
 print "do_query_count: nil query... "
