@@ -8,7 +8,8 @@ This gem is designed to be a concise, clear and maintainable collection of commo
 qb_api = Advantage::QuickbaseAPI.new( 'ais', 'username', 'password' )
 
 # Load all of the Books in our table
-books = qb_api.do_query( 'books_db_id', query: "{6.EX.'Book'}", clist: [7] )
+query_options = { query: "{6.EX.'Book'}", clist: [7] }
+books = qb_api.do_query( 'books_db_id', query_options )
 
 puts books.inspect
 # => [ {"7" => "Lord of the Flies"}, {"7" => "The Giver"} ]
@@ -70,7 +71,7 @@ call_successful = qb_api.delete_record( 'abcd1234', 136 )
 ````
 
 ###Import From CSV
-**import\_form\_csv( db\_id, data, columns )** => **[json] New Record Ids**
+**import\_from\_csv( db\_id, data, column\_field\_ids )** => **[json] New Record Ids**
 
 ```ruby
 new_data = [
