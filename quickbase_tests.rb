@@ -1,5 +1,12 @@
 #! /usr/bin/env ruby
 
+
+# README
+# To use, create a credentials.yml file with 2 lines:
+#  username: your_username
+#  password: your_password
+
+
 require 'yaml'
 require_relative 'quickbase'
 
