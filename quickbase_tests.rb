@@ -2,15 +2,16 @@
 
 
 # README
-# To use, create a credentials.yml file with 2 lines:
+# To use, create a config/credentials.yml file with 2 lines:
 #  username: your_username
 #  password: your_password
 
 
 require 'yaml'
-require_relative 'quickbase'
+require 'quickbase'
+require 'QuickbaseClient'
 
-login_info = YAML.load_file( 'credentials.yml' )
+login_info = YAML.load_file( 'config/credentials.yml' )
 
 puts login_info.inspect
 
