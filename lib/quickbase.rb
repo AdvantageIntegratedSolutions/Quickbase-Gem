@@ -3,7 +3,7 @@ require 'nokogiri'
 require 'json'
 require 'csv'
 
-module Quickbase
+module AdvantageQuickbase
   class API
     def initialize( domain, username, password, app_token=nil )
       @domain = domain
