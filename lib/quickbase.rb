@@ -5,6 +5,8 @@ require 'csv'
 
 module AdvantageQuickbase
   class API
+    attr_accessor :ticket
+
     def initialize( domain, username, password, app_token=nil )
       @domain = domain
 
@@ -95,6 +97,8 @@ module AdvantageQuickbase
     def normalize_list( list )
       if list.is_a?( Array )
         list = list.map { |fid| fid.to_s }.join( '.' )
+      elsif list.is_a?( Hash )
+        list = list.map { |name, fid| fid.to_s }.join( '.' )
       end
       list
     end
