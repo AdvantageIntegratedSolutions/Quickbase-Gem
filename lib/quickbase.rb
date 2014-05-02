@@ -17,7 +17,7 @@ module AdvantageQuickbase
       }
       request_xml = build_request_xml( data )
 
-      @http = Net::HTTP.new( base_url, 443 )
+      @http = Net::HTTP.new( base_domain, 443 )
       @http.use_ssl = true
       @http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
@@ -67,6 +67,7 @@ module AdvantageQuickbase
 
     def add_record( db_id, new_values )
       xml = build_update_xml( new_values )
+
       result = send_request( :addRecord, db_id, nil, xml )
 
       get_tag_value( result, :rid )
@@ -124,7 +125,11 @@ module AdvantageQuickbase
     end
 
     def base_url
-      "https://#{@domain}.quickbase.com"
+      "https://#{base_domain}"
+    end
+
+    def base_domain
+      "#{@domain}.quickbase.com"
     end
 
     def build_request_xml( tags )
