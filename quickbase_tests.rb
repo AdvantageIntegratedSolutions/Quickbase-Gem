@@ -8,7 +8,8 @@
 
 
 require 'yaml'
-require 'quickbase'
+# require 'quickbase'
+require_relative 'lib/quickbase'
 require 'QuickbaseClient'
 
 login_info = YAML.load_file( 'config/credentials.yml' )
@@ -16,8 +17,32 @@ login_info = YAML.load_file( 'config/credentials.yml' )
 puts login_info.inspect
 
 print "Connect to Quickbase... "
-quickbase = Quickbase::API.new( 'ais', login_info['username'], login_info['password'] )
+quickbase = AdvantageQuickbase::API.new( 'ais', login_info['username'], login_info['password'] )
 puts "complete."
+
+
+puts "get_schema  Table ... "
+result = quickbase.get_schema( 'bcyfufihg' )
+result.each do |key, value|
+  if key == :fields
+    puts "fields => #{value.length} fields"
+  else
+    puts "#{key} => #{value}"
+  end
+end
+
+puts "\nget_schema  App ... "
+result = quickbase.get_schema( 'bcyfufihf' )
+result.each do |key, value|
+  if key == :tables
+    puts "tables => #{value.length} tables"
+  else
+    puts "#{key} => #{value}"
+  end
+end
+
+exit
+
 
 print "do_query_count: nil query... "
 result = quickbase.do_query_count( 'bcyfufihg', nil )

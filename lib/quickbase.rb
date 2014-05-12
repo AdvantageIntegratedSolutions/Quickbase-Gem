@@ -94,6 +94,75 @@ module AdvantageQuickbase
       result.css('rid').map{ |xml_node| xml_node.text.to_i }
     end
 
+    def get_schema( db_id )
+      schema_hash = {}
+      result = send_request( :getSchema, db_id, {} )
+
+      # Get the table data
+      schema_hash[ :app_id ] = get_tag_value( result, 'app_id' )
+      schema_hash[ :table_id ] = get_tag_value( result, 'table_id' )
+      schema_hash[ :name ] = get_tag_value( result, 'name' )
+
+      if schema_hash[ :app_id ] == schema_hash[ :table_id ]
+        # App Mode
+        schema_hash[ :mode ] = 'app'
+
+        schema_hash[ :tables ] = {}
+        tables = result.css( 'chdbid' )
+        tables.each do |table|
+          table_hash = {
+            dbid: table.text,
+            name: table.attributes['name'].to_s
+          }
+
+          table_hash[ :name ].gsub!( /^_dbid_/, '' )
+          table_hash[ :name ].gsub!( '_', ' ' )
+          table_hash[ :name ].capitalize!
+
+          schema_hash[ :tables ][ table_hash[:dbid] ] = table_hash
+        end
+      else
+        # Table mode
+        schema_hash[ :mode ] = 'table'
+
+        # Parse the field data
+        schema_hash[ :fields ] = {}
+        fields = result.css( 'field' )
+        fields.each do |field|
+          field_hash = {
+            id: field.attributes[ 'id' ].to_s,
+            data_type: field.attributes[ 'field_type' ].to_s,
+            base_type: field.attributes[ 'base_type' ].to_s,
+            name: get_tag_value( field, 'label' ),
+            required: get_tag_value( field, 'required' ).to_i == 1,
+            unique: get_tag_value( field, 'unique' ).to_i == 1,
+          }
+
+          # Field type (Summary, Formula, Lookup, etc) is poorly represented. Fix that.
+          case field.attributes[ 'mode' ].to_s
+          when 'virtual'
+            field_hash[ :field_type ] = 'formula'
+          when ''
+            field_hash[ :field_type ] = 'normal'
+          else
+            field_hash[ :field_type ] = field.attributes[ 'mode' ].to_s
+          end
+
+          choices = field.css( 'choice' )
+          if choices.length > 0
+            field_hash[ :choices ] = []
+            choices.each do |choice|
+              field_hash[ :choices ] << choice.text
+            end
+          end
+
+          schema_hash[ :fields ][ field_hash[:id] ] = field_hash
+        end
+      end
+
+      schema_hash
+    end
+
     private
     def normalize_list( list )
       if list.is_a?( Array )
