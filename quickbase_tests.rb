@@ -23,6 +23,7 @@ puts "complete."
 
 puts "get_schema  Table ... "
 result = quickbase.get_schema( 'bcyfufihg' )
+
 result.each do |key, value|
   if key == :fields
     puts "fields => #{value.length} fields"
