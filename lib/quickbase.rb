@@ -67,7 +67,6 @@ module AdvantageQuickbase
 
     def add_record( db_id, new_values )
       xml = build_update_xml( new_values )
-
       result = send_request( :addRecord, db_id, nil, xml )
 
       get_tag_value( result, :rid )
@@ -213,7 +212,7 @@ module AdvantageQuickbase
       if record_id
         xml += "<key>#{record_id}</key>"
       end
-      xml += new_values.map { |field_id, value| "<field fid='#{field_id}'>#{value}</field>" }.join()
+      xml += new_values.map { |field_id, value| "<field fid='#{field_id}'>#{value.to_s.encode(xml: :text)}</field>" }.join()
       xml += "<ticket>#{@ticket}</ticket>"
       xml += '</qdbapi>'
     end
