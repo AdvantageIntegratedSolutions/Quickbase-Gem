@@ -41,12 +41,11 @@ result.each do |key, value|
   end
 end
 
-exit
-
 
 print "do_query_count: nil query... "
 result = quickbase.do_query_count( 'bcyfufihg', nil )
 puts result.inspect
+
 
 print "do_query_count: basic query... "
 expected_records = quickbase.do_query_count( 'bcyfufihg', '{3.GTE."1000"}' )

@@ -252,7 +252,16 @@ module AdvantageQuickbase
 
       result = @http.post( url, request_xml, headers )
 
-      parse_xml( result.body )
+      xml_result = parse_xml( result.body )
+
+      error_code = get_tag_value( xml_result, :errcode )
+      if error_code.to_i != 0
+        error_name = get_tag_value( xml_result, :errtext )
+        error_details = get_tag_value( xml_result, :errdetail )
+        raise "\nAPI ERROR ##{error_code}: #{error_name}\n#{error_details}"
+      end
+
+      xml_result
     end
   end
 end
