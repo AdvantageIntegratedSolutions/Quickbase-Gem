@@ -3,18 +3,30 @@ require 'nokogiri'
 require 'json'
 require 'csv'
 
+Dir['lib/*.rb'].each {|file| require_relative file.gsub!(/lib\//, "")}
+
 module AdvantageQuickbase
   class API
+
     attr_accessor :ticket
 
-    def initialize( domain, username, password, app_token=nil )
+    include User
+    include Table
+    
+    def initialize( domain, username, password, app_token=nil, ticket=nil)
       @domain = domain
 
-      data = {
-        username: username,
-        password: password,
-        apptoken: app_token
-      }
+      if username && password #authenticate with username/password
+        data = {
+          username: username,
+          password: password,
+          apptoken: app_token
+        }
+      else #authenticate with existing ticket
+        @ticket = ticket if ticket
+        data = {}
+      end
+
       request_xml = build_request_xml( data )
 
       @http = Net::HTTP.new( base_domain, 443 )
@@ -233,12 +245,27 @@ module AdvantageQuickbase
 
     def get_tag_value( xml, tag_name )
       tag = xml.css( tag_name.to_s )
+
       tag_value = nil
       if !tag.empty?
         tag_value = tag.text
       end
 
       tag_value
+    end
+
+    def get_attr_value(tag, attr_name)
+      attr_value = tag.attribute(attr_name.to_s).to_s
+    end
+
+    def send_quickbase_ui_action(url)
+      url = URI.parse(url)
+      request = Net::HTTP::Post.new(url.request_uri)
+      request.set_form_data({'ticket' => @ticket })
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+
+      response = http.request(request)
     end
 
     def send_request( api_call, db_id, request_data, request_xml=nil )
