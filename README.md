@@ -71,7 +71,7 @@ call_successful = qb_api.delete_record( 'abcd1234', 136 )
 ````
 
 ###Purge Records
-**purge\_records( db\_id, record\_id )** => **[int] Records Deleted**
+**purge\_records( db\_id, options )** => **[int] Records Deleted**
 
 ```ruby
 call_successful = qb_api.purge_records( 'abcd1234', {query, qid, qname} )
