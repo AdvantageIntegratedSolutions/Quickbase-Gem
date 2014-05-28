@@ -62,6 +62,11 @@ module AdvantageQuickbase
       options[ :clist ] = normalize_list( options[:clist] )
       options[ :slist ] = normalize_list( options[:slist] )
 
+      # Empty clist now loads all columns instead of "default"
+      if options[ :clist ].to_s.empty?
+        options[ :clist ] = 'a'
+      end
+
       result = send_request( :doQuery, db_id, options )
 
       return_json = []
