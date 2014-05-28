@@ -74,7 +74,7 @@ call_successful = qb_api.delete_record( 'abcd1234', 136 )
 **purge\_records( db\_id, options )** => **[int] Records Deleted**
 
 ```ruby
-call_successful = qb_api.purge_records( 'abcd1234', {query, qid, qname} )
+records_deleted = qb_api.purge_records( 'abcd1234', {qid: "6"} )
 ````
 
 ###Import From CSV
