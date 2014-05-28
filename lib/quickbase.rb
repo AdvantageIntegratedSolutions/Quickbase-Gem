@@ -103,6 +103,10 @@ module AdvantageQuickbase
     end
 
     def purge_records ( db_id, options={} )
+      if options.length == 0
+        options[ :query ] = ''
+      end
+
       result = send_request( :purgeRecords, db_id, options )
 
       get_tag_value( result, :num_records_deleted ).to_s
