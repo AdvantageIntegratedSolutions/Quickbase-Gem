@@ -70,6 +70,13 @@ call_successful = qb_api.edit_record( 'abcd1234', 136, new_data )
 call_successful = qb_api.delete_record( 'abcd1234', 136 )
 ````
 
+###Purge Records
+**purge\_records( db\_id, record\_id )** => **[int] Records Deleted**
+
+```ruby
+call_successful = qb_api.purge_records( 'abcd1234', {query, qid, qname} )
+````
+
 ###Import From CSV
 **import\_from\_csv( db\_id, data, column\_field\_ids )** => **[json] New Record Ids**
 
