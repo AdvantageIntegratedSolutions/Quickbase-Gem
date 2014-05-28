@@ -3,7 +3,8 @@ require 'nokogiri'
 require 'json'
 require 'csv'
 
-Dir['lib/*.rb'].each {|file| require_relative file.gsub!(/lib\//, "")}
+require_relative 'user'
+require_relative 'table'
 
 module AdvantageQuickbase
   class API
