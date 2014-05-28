@@ -12,7 +12,7 @@ module AdvantageQuickbase
 
     include User
     include Table
-    
+
     def initialize( domain, username, password, app_token=nil, ticket=nil)
       @domain = domain
 
