@@ -102,6 +102,12 @@ module AdvantageQuickbase
       get_tag_value( result, :rid ).to_s == record_id.to_s
     end
 
+    def purge_records ( db_id, options={} )
+      result = send_request( :purgeRecords, db_id, options )
+
+      get_tag_value( result, :num_records_deleted ).to_s
+    end
+
     def import_from_csv( db_id, data_array, columns )
       columns = normalize_list( columns )
       xml = build_csv_xml( data_array, columns )

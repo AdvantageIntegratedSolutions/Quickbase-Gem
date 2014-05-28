@@ -70,6 +70,20 @@ call_successful = qb_api.edit_record( 'abcd1234', 136, new_data )
 call_successful = qb_api.delete_record( 'abcd1234', 136 )
 ````
 
+###Purge Records
+**purge\_records( db\_id, options )** => **[int] Records Deleted**
+
+`options` expects a hash containing any of the following options:
+
+* `query` - typical Quickbase query string. ex: `"{3.EX.'123'}"`
+* `qid` - report or query id to load (should not be used with `query` or `qname`)
+* `qname` - report or query name to load (should not be used with `query` or `qid`)
+
+
+```ruby
+records_deleted = qb_api.purge_records( 'abcd1234', {qid: 6} )
+````
+
 ###Import From CSV
 **import\_from\_csv( db\_id, data, column\_field\_ids )** => **[json] New Record Ids**
 

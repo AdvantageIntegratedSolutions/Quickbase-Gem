@@ -72,6 +72,10 @@ print "import_from_csv... "
 new_records = quickbase.import_from_csv( 'bhxa5rfap', [["CSV Import 1"], ["CSV Import 2"]], [6] )
 puts new_records.inspect
 
+print "purge records... "
+result = quickbase.purge_records( 'bhxa5rfap' )
+puts result
+
 print "import_from_csv with fucked data... "
 new_records += quickbase.import_from_csv( 'bhxa5rfap', [["CSV Import\n\n1"], ["CSV & <Import> 2"]], [6] )
 puts new_records.inspect
