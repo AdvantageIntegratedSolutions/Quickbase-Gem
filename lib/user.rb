@@ -71,6 +71,39 @@ module AdvantageQuickbase
         end
       end
 
+      def deactivate_users(account_id, emails)
+        user_ids = get_user_ids(emails);
+
+        url = "https://#{base_domain}/db/main?a=QBI_AccountRemoveMultiUserAccess"
+        url += "&accountid=#{account_id}"
+        url += "&removeAction=deact"
+        url += "&uids=" + user_ids.join(",")
+
+        result = send_quickbase_ui_action(url)
+        result = parse_xml( result.body )
+
+        get_tag_value(result, "numchanged")
+      end
+
+      def reactivate_users(account_id, emails)
+        user_ids = get_user_ids(emails);
+        numchanged = 0
+
+        url = "https://#{base_domain}/db/main?a=QBI_DeactivateUser"
+        url += "&cmpid=#{account_id}"
+        url += "&tuid="
+
+        user_ids.each do |id|
+          activate = url + id
+          result = send_quickbase_ui_action(activate)
+          result = parse_xml( result.body )
+          
+          numchanged += 1 if get_tag_value(result, "newstatus")
+        end
+
+        numchanged
+      end
+
       def deny_users(account_id, emails)
         user_ids = get_user_ids(emails);
 

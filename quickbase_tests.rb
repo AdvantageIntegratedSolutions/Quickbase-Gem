@@ -116,6 +116,14 @@ puts "get_app_access"
 result = quickbase.get_app_access()
 puts result
 
+puts "deactivate_users"
+result = quickbase.deactivate_users("120612", ["kithensel@gmail.com"])
+puts result
+
+puts "reactivate_users"
+result = quickbase.reactivate_users("120612", ["kithensel@gmail.com"])
+puts result
+
 puts "deny_users"
 result = quickbase.deny_users("120612", ["kithensel@gmail.com"])
 puts result
