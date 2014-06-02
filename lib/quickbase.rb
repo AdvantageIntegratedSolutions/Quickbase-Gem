@@ -274,10 +274,10 @@ module AdvantageQuickbase
       attr_value = tag.attribute(attr_name.to_s).to_s
     end
 
-    def send_quickbase_ui_action(url)
+    def send_quickbase_ui_action(url, parameters={})
       url = URI.parse(url)
       request = Net::HTTP::Post.new(url.request_uri)
-      request.set_form_data({'ticket' => @ticket })
+      request.set_form_data({'ticket' => @ticket }.merge(parameters))
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true
 
