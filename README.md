@@ -1,5 +1,7 @@
 #Ruby Quickbase Gem for Humans
 
+[![Gem Version](https://badge.fury.io/rb/advantage_quickbase.svg)](http://badge.fury.io/rb/advantage_quickbase)
+
 This gem is designed to be a concise, clear and maintainable collection of common Quickbase API calls used in ruby development. It implements a subset of the total Quickbase API.
 
 ##Example
