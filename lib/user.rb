@@ -71,6 +71,57 @@ module AdvantageQuickbase
         end
       end
 
+      def get_page_token(url)
+        response = send_quickbase_ui_action(url)
+        response.body.match(/name=PageToken value=(.*)>/)[1]
+      end
+
+      def remove_acct_management(account_id, emails)
+        user_ids = get_user_ids(emails);
+        user_ids.map!{ |user_id| "US" + user_id.split(".")[0] + "=12"}
+        user_ids = user_ids.join(",")
+
+        url = "https://#{base_domain}/db/main?a=DoAccountPerms"
+        url += "&accountid=#{account_id}"
+        page_token = get_page_token(url)
+
+        send_quickbase_ui_action(url, {'accountID' => account_id, 'retval' => user_ids, 'pageToken' => page_token})
+      end
+
+      def deactivate_users(account_id, emails)
+        remove_acct_management(account_id, emails)
+        user_ids = get_user_ids(emails);
+
+        url = "https://#{base_domain}/db/main?a=QBI_AccountRemoveMultiUserAccess"
+        url += "&accountid=#{account_id}"
+        url += "&removeAction=deact"
+        url += "&uids=" + user_ids.join(",")
+
+        result = send_quickbase_ui_action(url)
+        result = parse_xml( result.body )
+
+        get_tag_value(result, "numchanged")
+      end
+
+      def reactivate_users(account_id, emails)
+        user_ids = get_user_ids(emails);
+        numchanged = 0
+
+        url = "https://#{base_domain}/db/main?a=QBI_DeactivateUser"
+        url += "&cmpid=#{account_id}"
+        url += "&tuid="
+
+        user_ids.each do |id|
+          activate = url + id
+          result = send_quickbase_ui_action(activate)
+          result = parse_xml( result.body )
+          
+          numchanged += 1 if get_tag_value(result, "newstatus")
+        end
+
+        numchanged
+      end
+
       def deny_users(account_id, emails)
         user_ids = get_user_ids(emails);
 
