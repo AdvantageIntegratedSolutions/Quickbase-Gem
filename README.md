@@ -7,7 +7,7 @@ This gem is designed to be a concise, clear and maintainable collection of commo
 ##Example
 ```ruby
 # Create a new API connection
-qb_api = AdvantageQuickbase::API.new( 'ais', 'username', 'password' )
+qb_api = AdvantageQuickbase::API.new( 'domain', 'username', 'password' )
 
 # Load all of the Books in our table
 query_options = { query: "{6.EX.'Book'}", clist: [7] }
