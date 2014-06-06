@@ -2,6 +2,7 @@ require 'net/https'
 require 'nokogiri'
 require 'json'
 require 'csv'
+require 'base64'
 
 require_relative 'user'
 require_relative 'table'
@@ -240,9 +241,24 @@ module AdvantageQuickbase
       if record_id
         xml += "<key>#{record_id}</key>"
       end
-      xml += new_values.map { |field_id, value| "<field fid='#{field_id}'>#{value.to_s.encode(xml: :text)}</field>" }.join()
+
+      new_values = new_values.map do |field_id, value|
+        if value.is_a?(Hash)
+          file = encode_file( value[:file] )
+          "<field fid='#{field_id}' filename='#{value[:name]}'>#{file}</field>"
+        else
+          "<field fid='#{field_id}'>#{value.to_s.encode(xml: :text)}</field>"
+        end
+      end
+
+      xml += new_values.join()
       xml += "<ticket>#{@ticket}</ticket>"
       xml += '</qdbapi>'
+    end
+
+    def encode_file ( file )
+      file = File.open(file, 'rb') { |f| f.read } if File.file?(file)
+      Base64.strict_encode64( file )
     end
 
     def build_csv_xml( new_values, fields_to_import )
