@@ -243,7 +243,8 @@ module AdvantageQuickbase
       end
 
       new_values = new_values.map do |field_id, value|
-        if value.is_a?(Hash)
+        # Values that are hashes with name and file are encoded seperately
+        if value.is_a?( Hash ) && value[:name] && value[:file]
           file = encode_file( value[:file] )
           "<field fid='#{field_id}' filename='#{value[:name]}'>#{file}</field>"
         else
@@ -256,9 +257,15 @@ module AdvantageQuickbase
       xml += '</qdbapi>'
     end
 
-    def encode_file ( file )
-      file = File.open(file, 'rb') { |f| f.read } if File.file?(file)
-      Base64.strict_encode64( file )
+    def encode_file( path_or_content )
+      # File accepts either file content or a file path
+      if File.file?( path_or_content )
+        file_content = File.open(file, 'rb') { |f| f.read }
+      else
+        file_content = path_or_content
+      end
+
+      Base64.strict_encode64( file_content )
     end
 
     def build_csv_xml( new_values, fields_to_import )
