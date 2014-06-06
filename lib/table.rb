@@ -42,13 +42,12 @@ module AdvantageQuickbase
         result = send_request( :UserRoles, db_id, {})
 
         result.css( 'user' ).each do |user|
-          puts user
           users << {
             :id => get_attr_value(user, :id),
             :last_access => get_tag_value(user, :lastaccess),
             :first_name => get_tag_value(user, :firstname),
             :last_name => get_tag_value(user, :lastname),
-            :roles => { :name => get_tag_value(user.css( 'role' ), :name), :access => get_tag_value(user.css( 'role' ), :access)}
+            :roles => { :id => get_attr_value(user.css( 'role' ), :id), :name => get_tag_value(user.css( 'role' ), :name), :access => get_tag_value(user.css( 'role' ), :access)}
           }
         end
 
