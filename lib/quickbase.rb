@@ -260,7 +260,7 @@ module AdvantageQuickbase
     def encode_file( path_or_content )
       # File accepts either file content or a file path
       if File.file?( path_or_content )
-        file_content = File.open(file, 'rb') { |f| f.read }
+        file_content = File.open(path_or_content, 'rb') { |f| f.read }
       else
         file_content = path_or_content
       end
