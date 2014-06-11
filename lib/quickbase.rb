@@ -54,6 +54,17 @@ module AdvantageQuickbase
       get_tag_value( result, :nummatches ).to_i
     end
 
+    def find( db_id, rid, options={} )
+      options[:query] = "{'3'.EX.'#{rid}'}"
+      records = self.do_query( db_id, options )
+
+      if records.length > 0
+        return records.first
+      else 
+        return {}
+      end
+    end
+
     def do_query( db_id, options )
       # Define the query format
       if !options[ :fmt ]
