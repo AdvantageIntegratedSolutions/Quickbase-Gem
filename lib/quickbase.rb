@@ -155,7 +155,9 @@ module AdvantageQuickbase
 
         # Parse the field data
         schema_hash[ :fields ] = {}
+
         fields = result.css( 'field' )
+
         fields.each do |field|
           field_hash = {
             id: field.attributes[ 'id' ].to_s,
@@ -185,6 +187,22 @@ module AdvantageQuickbase
           end
 
           schema_hash[ :fields ][ field_hash[:id] ] = field_hash
+        end
+
+        #Parse the report data
+        schema_hash[ :reports ] = {}
+        reports = result.css( 'query' )
+        reports.each do |report|
+          report_hash = {
+            id: report.attributes[ 'id' ].to_s,
+            name: get_tag_value( report, 'qyname' ),
+            type: get_tag_value( report, 'qytype' ),
+            criteria: get_tag_value( report, 'qycrit' ),
+            clist: get_tag_value( report, 'qyclst' ),
+            slist: get_tag_value( report, 'qyslst' )
+          }
+
+          schema_hash[ :reports ][ report_hash[:id] ] = report_hash
         end
       end
 
