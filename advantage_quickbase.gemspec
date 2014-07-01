@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name            = 'advantage_quickbase'
-  s.version         = '0.6.6'
+  s.version         = '0.6.7'
   s.date            = '2014-06-04'
 
   s.summary         = 'Quickbase API gem'
