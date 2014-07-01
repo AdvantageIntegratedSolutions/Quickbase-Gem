@@ -26,7 +26,12 @@ module AdvantageQuickbase
         }
       else #authenticate with existing ticket
         @ticket = ticket if ticket
-        data = {}
+
+        if app_token
+          data = {
+            apptoken: app_token
+          }
+        end
       end
 
       request_xml = build_request_xml( data )
