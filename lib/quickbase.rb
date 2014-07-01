@@ -10,7 +10,7 @@ require_relative 'table'
 module AdvantageQuickbase
   class API
 
-    attr_accessor :ticket
+    attr_accessor :ticket, :app_token
 
     include User
     include Table
@@ -26,14 +26,9 @@ module AdvantageQuickbase
         }
       else #authenticate with existing ticket
         @ticket = ticket if ticket
-
-        data = {}
+        @app_token = app_token if app_token
         
-        if app_token
-          data = {
-            apptoken: app_token
-          }
-        end
+        data = {}
       end
 
       request_xml = build_request_xml( data )
@@ -285,6 +280,7 @@ module AdvantageQuickbase
       xml = '<qdbapi>'
       xml += tags.map{ |name, value| "<#{name}>#{value}</#{name}>" }.join()
       xml += "<ticket>#{@ticket}</ticket>"
+      xml += "<apptoken>#{@app_token}</apptoken>"
       xml += '</qdbapi>'
     end
 
