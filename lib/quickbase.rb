@@ -125,6 +125,22 @@ module AdvantageQuickbase
       get_tag_value( result, :num_records_deleted ).to_s
     end
 
+    def create_app_token(db_id, description, page_token)
+      url = "https://#{base_domain}/db/main?a=QBI_CreateDeveloperKey"
+
+      result = send_quickbase_ui_action(url)
+      result = parse_xml( result.body )
+
+      app_token = get_tag_value(result, "devkey")
+
+      url = URI::encode("https://#{base_domain}/db/#{db_id}?a=QBI_AddApplicationDeveloperKey&devKey=#{app_token}&keydescription=#{description}&keyType=P&PageToken=#{page_token}")
+
+      result = send_quickbase_ui_action(url)
+      result = parse_xml( result.body )
+
+      app_token
+    end
+
     def import_from_csv( db_id, data_array, columns )
       columns = normalize_list( columns )
       xml = build_csv_xml( data_array, columns )
@@ -344,7 +360,6 @@ module AdvantageQuickbase
 
       url = build_request_url( api_call, db_id )
       headers = build_request_headers( api_call, request_xml )
-
       result = @http.post( url, request_xml, headers )
 
       xml_result = parse_xml( result.body )
