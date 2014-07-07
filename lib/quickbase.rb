@@ -10,13 +10,14 @@ require_relative 'table'
 module AdvantageQuickbase
   class API
 
-    attr_accessor :ticket
+    attr_accessor :ticket, :app_token
 
     include User
     include Table
 
     def initialize( domain, username, password, app_token=nil, ticket=nil)
       @domain = domain
+      @app_token = app_token if app_token
 
       if username && password #authenticate with username/password
         data = {
@@ -26,6 +27,7 @@ module AdvantageQuickbase
         }
       else #authenticate with existing ticket
         @ticket = ticket if ticket
+
         data = {}
       end
 
@@ -52,6 +54,17 @@ module AdvantageQuickbase
     def do_query_count( db_id, query )
       result = send_request( :doQueryCount, db_id, {query: query} )
       get_tag_value( result, :nummatches ).to_i
+    end
+
+    def find( db_id, rid, options={} )
+      options[:query] = "{'3'.EX.'#{rid}'}"
+      records = self.do_query( db_id, options )
+
+      if records.length > 0
+        return records.first
+      else 
+        return {}
+      end
     end
 
     def do_query( db_id, options )
@@ -114,6 +127,22 @@ module AdvantageQuickbase
       get_tag_value( result, :num_records_deleted ).to_s
     end
 
+    def create_app_token(db_id, description, page_token)
+      url = "https://#{base_domain}/db/main?a=QBI_CreateDeveloperKey"
+
+      result = send_quickbase_ui_action(url)
+      result = parse_xml( result.body )
+
+      app_token = get_tag_value(result, "devkey")
+
+      url = URI::encode("https://#{base_domain}/db/#{db_id}?a=QBI_AddApplicationDeveloperKey&devKey=#{app_token}&keydescription=#{description}&keyType=P&PageToken=#{page_token}")
+
+      result = send_quickbase_ui_action(url)
+      result = parse_xml( result.body )
+
+      app_token
+    end
+
     def import_from_csv( db_id, data_array, columns )
       columns = normalize_list( columns )
       xml = build_csv_xml( data_array, columns )
@@ -155,7 +184,9 @@ module AdvantageQuickbase
 
         # Parse the field data
         schema_hash[ :fields ] = {}
+
         fields = result.css( 'field' )
+
         fields.each do |field|
           field_hash = {
             id: field.attributes[ 'id' ].to_s,
@@ -185,6 +216,22 @@ module AdvantageQuickbase
           end
 
           schema_hash[ :fields ][ field_hash[:id] ] = field_hash
+        end
+
+        #Parse the report data
+        schema_hash[ :reports ] = {}
+        reports = result.css( 'query' )
+        reports.each do |report|
+          report_hash = {
+            id: report.attributes[ 'id' ].to_s,
+            name: get_tag_value( report, 'qyname' ),
+            type: get_tag_value( report, 'qytype' ),
+            criteria: get_tag_value( report, 'qycrit' ),
+            clist: get_tag_value( report, 'qyclst' ),
+            slist: get_tag_value( report, 'qyslst' )
+          }
+
+          schema_hash[ :reports ][ report_hash[:id] ] = report_hash
         end
       end
 
@@ -233,6 +280,7 @@ module AdvantageQuickbase
       xml = '<qdbapi>'
       xml += tags.map{ |name, value| "<#{name}>#{value}</#{name}>" }.join()
       xml += "<ticket>#{@ticket}</ticket>"
+      xml += "<apptoken>#{@app_token}</apptoken>"
       xml += '</qdbapi>'
     end
 
@@ -315,7 +363,6 @@ module AdvantageQuickbase
 
       url = build_request_url( api_call, db_id )
       headers = build_request_headers( api_call, request_xml )
-
       result = @http.post( url, request_xml, headers )
 
       xml_result = parse_xml( result.body )
