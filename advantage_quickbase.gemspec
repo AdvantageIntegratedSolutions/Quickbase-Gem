@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name            = 'advantage_quickbase'
-  s.version         = '0.7.0'
-  s.date            = '2014-07-07'
+  s.version         = '0.7.1'
+  s.date            = '2014-07-08'
 
   s.summary         = 'Quickbase API gem'
   s.description     = 'Fast, concise implementation of select Quickbase API functions'

@@ -302,6 +302,7 @@ module AdvantageQuickbase
 
       xml += new_values.join()
       xml += "<ticket>#{@ticket}</ticket>"
+      xml += "<apptoken>#{@app_token}</apptoken>"
       xml += '</qdbapi>'
     end
 
@@ -323,6 +324,7 @@ module AdvantageQuickbase
       xml += "]]></records_csv>"
       xml += "<clist>#{fields_to_import}</clist>"
       xml += "<ticket>#{@ticket}</ticket>"
+      xml += "<apptoken>#{@app_token}</apptoken>"
       xml += '</qdbapi>'
     end
 
