@@ -34,6 +34,7 @@ module AdvantageQuickbase
       request_xml = build_request_xml( data )
 
       @http = Net::HTTP.new( base_domain, 443 )
+      @http.read_timeout = 360
       @http.use_ssl = true
       @http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
