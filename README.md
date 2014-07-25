@@ -23,6 +23,8 @@ puts books.inspect
 ```ruby
 qb_api = Advantage::QuickbaseAPI.new( :app_domain, :username, :password )
 ```
+###Find
+***find(db\_id, record\_id, query\_options)** => **[json] record**
 
 ###Do Query Count
 **do\_query\_count( db_id, query=nil )** => **[int] Record Count**
