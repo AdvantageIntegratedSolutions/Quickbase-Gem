@@ -104,7 +104,13 @@ records_deleted = qb_api.purge_records( 'abcd1234', {qid: 6} )
 
 ###Get Schema
 Get the complete schema of the whole quickbase app
+
+
 **get_schema( db_id )**
+
+```ruby
+app_schema = qb_api.get_schema( 'abcd1234' )
+````
 
 ###Import From CSV
 **import\_from\_csv( db\_id, data, column\_field\_ids )** => **[json] New Record Ids**
