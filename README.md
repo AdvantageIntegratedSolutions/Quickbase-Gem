@@ -24,11 +24,11 @@ puts books.inspect
 qb_api = Advantage::QuickbaseAPI.new( :app_domain, :username, :password )
 ```
 ###Find
-*Find that singular Quickbase record and return as a json object.
+* Find that singular Quickbase record and return as a json object.
 **find(db\_id, record\_id, query\_options)** => **[json] record**
 
 ###Create App Token
-*Create an app token that gives you access to that Quickbase app.
+* Create an app token that gives you access to that Quickbase app.
 **create\_app\_token(db\_id, description, page\_token)
 
 ###Do Query Count
