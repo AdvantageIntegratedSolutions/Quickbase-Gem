@@ -134,3 +134,8 @@ Create an app token that gives you access to that Quickbase app
 * `db_id` - database id
 * `description` - description of what the token is for
 * `page_token` - token hidden in the page DOM
+
+
+```ruby
+app_token = qb_api.create_app_token( 'abcd1234', 'Access all the books in the database', 'TugHxxkil9t6Kdebac' )
+````
