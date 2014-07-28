@@ -29,15 +29,16 @@ Find that singular Quickbase record and return as a json object
 
 **find(db\_id, record\_id, query\_options)** => **[json] record**
 
-###Create App Token
-Create an app token that gives you access to that Quickbase app
 
+```ruby
+#Load the record that has a Record ID 8 from the books table
+query_options = { clist: [3,7,8] }
+book = qb_api.find( 'books_db_id', '8' , query_options )
 
-**create\_app\_token(db\_id, description, page\_token)**
+puts book.inspect
+# => [ {"3" => "8"}, {"7" => "The Giver"}, {"8" => "Lois Lowry"} ]
+```
 
-* `db_id` - database id
-* `description` - description of what the token is for
-* `page_token` - token hidden in the page DOM
 
 ###Do Query Count
 **do\_query\_count( db_id, query=nil )** => **[int] Record Count**
@@ -101,6 +102,10 @@ call_successful = qb_api.delete_record( 'abcd1234', 136 )
 records_deleted = qb_api.purge_records( 'abcd1234', {qid: 6} )
 ````
 
+###Get Schema
+Get the complete schema of the whole quickbase app
+**get_schema( db_id )**
+
 ###Import From CSV
 **import\_from\_csv( db\_id, data, column\_field\_ids )** => **[json] New Record Ids**
 
@@ -112,3 +117,14 @@ new_data = [
 ]
 record_ids = qb_api.import_from_csv( 'abcd1234', new_data, [6, 7, 8] )
 ````
+
+
+###Create App Token
+Create an app token that gives you access to that Quickbase app
+
+
+**create\_app\_token(db\_id, description, page\_token)**
+
+* `db_id` - database id
+* `description` - description of what the token is for
+* `page_token` - token hidden in the page DOM
