@@ -28,8 +28,12 @@ Find that singular Quickbase record and return as a json object.
 **find(db\_id, record\_id, query\_options)** => **[json] record**
 
 ###Create App Token
-Create an app token that gives you access to that Quickbase app.
-**create\_app\_token(db\_id, description, page\_token)
+Create an app token that gives you access to that Quickbase app
+**create\_app\_token(db\_id, description, page\_token)**
+
+* `db_id` - database id
+* `description` - description of what the token is for
+* `page_token` - token hidden in the page DOM
 
 ###Do Query Count
 **do\_query\_count( db_id, query=nil )** => **[int] Record Count**
