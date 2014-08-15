@@ -63,7 +63,7 @@ module AdvantageQuickbase
 
       if records.length > 0
         return records.first
-      else 
+      else
         return {}
       end
     end
@@ -280,8 +280,7 @@ module AdvantageQuickbase
     def build_request_xml( tags )
       xml = '<qdbapi>'
       xml += tags.map{ |name, value| "<#{name}>#{value}</#{name}>" }.join()
-      xml += "<ticket>#{@ticket}</ticket>"
-      xml += "<apptoken>#{@app_token}</apptoken>"
+      xml += ticket_and_token
       xml += '</qdbapi>'
     end
 
@@ -302,8 +301,7 @@ module AdvantageQuickbase
       end
 
       xml += new_values.join()
-      xml += "<ticket>#{@ticket}</ticket>"
-      xml += "<apptoken>#{@app_token}</apptoken>"
+      xml += ticket_and_token
       xml += '</qdbapi>'
     end
 
@@ -324,9 +322,13 @@ module AdvantageQuickbase
       xml += new_values.map{ |line| CSV.generate_line(line) }.join()
       xml += "]]></records_csv>"
       xml += "<clist>#{fields_to_import}</clist>"
-      xml += "<ticket>#{@ticket}</ticket>"
-      xml += "<apptoken>#{@app_token}</apptoken>"
+      xml += ticket_and_token
       xml += '</qdbapi>'
+    end
+
+    def ticket_and_token
+      "<ticket>#{@ticket}</ticket>" +
+      "<apptoken>#{@app_token}</apptoken>"
     end
 
     def parse_xml( xml )
