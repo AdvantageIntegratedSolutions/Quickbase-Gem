@@ -115,7 +115,7 @@ module AdvantageQuickbase
           activate = url + id
           result = send_quickbase_ui_action(activate)
           result = parse_xml( result.body )
-          
+
           numchanged += 1 if get_tag_value(result, "newstatus")
         end
 
