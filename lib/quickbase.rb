@@ -144,9 +144,12 @@ module AdvantageQuickbase
       app_token
     end
 
-    def import_from_csv( db_id, data_array, columns )
+    def import_from_csv( db_id, import_data, columns=nil )
+      # If import_data contains hashes, use the keys as the import headers
+      columns ||= import_data[ 0 ].map{ |fid, value| fid }
       columns = normalize_list( columns )
-      xml = build_csv_xml( data_array, columns )
+
+      xml = build_csv_xml( import_data, columns )
 
       result = send_request( :importFromCSV, db_id, nil, xml )
       result.css('rid').map{ |xml_node| xml_node.text.to_i }
@@ -317,9 +320,18 @@ module AdvantageQuickbase
     end
 
     def build_csv_xml( new_values, fields_to_import )
+      csv_data = []
+      new_values.each do |line|
+        if line.is_a?( Array )
+          csv_data << CSV.generate_line( line )
+        elsif line.is_a?( Hash )
+          csv_data << CSV.generate_line( line.map{ |k, v| v } )
+        end
+      end
+
       xml = '<qdbapi>'
       xml += "<records_csv><![CDATA[\n"
-      xml += new_values.map{ |line| CSV.generate_line(line) }.join()
+      xml += csv_data.join()
       xml += "]]></records_csv>"
       xml += "<clist>#{fields_to_import}</clist>"
       xml += ticket_and_token
