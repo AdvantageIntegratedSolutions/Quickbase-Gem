@@ -1,7 +1,7 @@
 module AdvantageQuickbase
   class API
     module User
-      def get_user_info(email)
+      def get_user_info( email )
         user = send_request( :GetUserInfo, "main", { :email => email })
         user = {
           :id => get_attr_value(user.css("user"), :id),
@@ -14,18 +14,23 @@ module AdvantageQuickbase
       end
 
       def get_user_role(db_id, user_id)
-        roles = []
         result = send_request(:GetUserRole, db_id, { :userid => user_id })
 
+        user = {
+          id: get_attr_value( result.css('user'), :id ),
+          name: get_tag_value( result, :name ),
+          roles: []
+        }
+
         result.css( 'role' ).each do |role|
-          roles << role = { 
-            :id => get_attr_value(role, :id), 
-            :name => get_tag_value(role, :name), 
-            :type => get_tag_value(role, :access )
+          user[ :roles ] << {
+            :id => get_attr_value( role, :id ),
+            :name => get_tag_value( role, :name ),
+            :type => get_tag_value( role, :access )
           }
         end
 
-        roles
+        user
       end
 
       def add_user_to_role(db_id, user_id, role_id)
@@ -44,7 +49,7 @@ module AdvantageQuickbase
         options = {
           :email => email,
           :roleid => role_id,
-          :first_name => first_name, 
+          :first_name => first_name,
           :last_name => last_name
         }
 
@@ -64,9 +69,9 @@ module AdvantageQuickbase
 
       def remove_access(db_id, email)
         user = self.get_user_info(email)
-        roles = get_user_role(db_id, user[:id])
+        user_roles = get_user_role(db_id, user[:id])
 
-        roles.each do |role|
+        user_roles[:roles].each do |role|
           self.remove_user_from_role(db_id, user[:id], role[:id])
         end
       end
