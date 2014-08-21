@@ -352,7 +352,7 @@ module AdvantageQuickbase
 
       tag_value = nil
       if !tag.empty?
-        tag_value = tag.text
+        tag_value = tag[ 0 ].text
       end
 
       tag_value
