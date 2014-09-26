@@ -109,13 +109,13 @@ module AdvantageQuickbase
       xml = build_update_xml( new_values, record_id )
       result = send_request( :editRecord, db_id, nil, xml )
 
-      get_tag_value( result, :rid ).to_s == record_id.to_s
+      get_tag_value( result, :rid ).to_i > 0
     end
 
     def delete_record( db_id, record_id )
       result = send_request( :deleteRecord, db_id, {rid: record_id} )
 
-      get_tag_value( result, :rid ).to_s == record_id.to_s
+      get_tag_value( result, :rid ).to_i > 0
     end
 
     def purge_records ( db_id, options={} )
