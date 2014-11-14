@@ -145,14 +145,19 @@ module AdvantageQuickbase
     end
 
     def import_from_csv( db_id, import_data, columns=nil )
-      # If import_data contains hashes, use the keys as the import headers
-      columns ||= import_data[ 0 ].map{ |fid, value| fid }
-      columns = normalize_list( columns )
+      result = []
+      if import_data && import_data.length > 0
+        # If import_data contains hashes, use the keys as the import headers
+        columns ||= import_data[ 0 ].map{ |fid, value| fid }
+        columns = normalize_list( columns )
 
-      xml = build_csv_xml( import_data, columns )
+        xml = build_csv_xml( import_data, columns )
 
-      result = send_request( :importFromCSV, db_id, nil, xml )
-      result.css('rid').map{ |xml_node| xml_node.text.to_i }
+        result = send_request( :importFromCSV, db_id, nil, xml )
+        result.css('rid').map{ |xml_node| xml_node.text.to_i }
+      end
+
+      result
     end
 
     def get_schema( db_id )
