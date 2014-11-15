@@ -78,8 +78,8 @@ module AdvantageQuickbase
       options[ :clist ] = normalize_list( options[:clist] )
       options[ :slist ] = normalize_list( options[:slist] )
 
-      # Empty clist now loads all columns instead of "default"
-      if options[ :clist ].to_s.empty?
+      # nil clist loads all columns instead of "default"
+      if options[ :clist ].nil?
         options[ :clist ] = 'a'
       end
 
