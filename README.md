@@ -1,4 +1,4 @@
-#Ruby Quickbase Gem for Humans
+#AIS QuickBase Ruby Gem
 
 [![Gem Version](https://badge.fury.io/rb/advantage_quickbase.svg)](http://badge.fury.io/rb/advantage_quickbase)
 

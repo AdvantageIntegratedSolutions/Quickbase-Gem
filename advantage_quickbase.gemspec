@@ -1,13 +1,13 @@
 Gem::Specification.new do |s|
   s.name            = 'advantage_quickbase'
-  s.version         = '0.8.2'
-  s.date            = '2014-09-26'
+  s.version         = '0.8.3'
+  s.date            = '2014-11-14'
 
   s.summary         = 'Quickbase API gem'
   s.description     = 'Fast, concise implementation of select Quickbase API functions'
   s.authors         = ["Ben Roux"]
   s.email           = 'liquid.ise@gmail.com'
-  s.homepage        = 'https://github.com/liquidise/Quickbase-Gem'
+  s.homepage        = 'https://github.com/AdvantageIntegratedSolutions/Quickbase-Gem'
   s.license         = 'MIT'
 
   s.files           = Dir['lib/*.rb']

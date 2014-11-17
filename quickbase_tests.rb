@@ -80,6 +80,10 @@ print "import_from_csv with a hash... "
 new_records = quickbase.import_from_csv( 'bhxa5rfap', [{6 => "CSV Import 1"}, {6 => ["CSV Import 2"]}] )
 puts new_records.inspect
 
+print "import_from_csv with empty data... "
+new_records = quickbase.import_from_csv( 'bhxa5rfap', [] )
+puts new_records.inspect
+
 print "purge records... "
 result = quickbase.purge_records( 'bhxa5rfap' )
 puts result
