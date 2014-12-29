@@ -70,7 +70,7 @@ module AdvantageQuickbase
 
     def do_query( db_id, options )
       # Define the query format
-      if !options[ :fmt ]
+      if options.has_key? :fmt
         options[ :fmt ] = 'structured'
       end
 
@@ -88,8 +88,14 @@ module AdvantageQuickbase
       return_json = []
       result.css( 'record' ).each do |record|
         json_record = {}
-        record.css( 'f' ).each do |field|
-          json_record[ field['id'] ] = field.text
+        if options.has_key? :fmt
+          record.css( 'f' ).each do |field|
+            json_record[ field['id'] ] = field.text
+          end
+        else
+          record.element_children.each do |field|
+            json_record[ field.node_name ] = field.text
+          end
         end
 
         return_json << json_record
