@@ -154,7 +154,7 @@ module AdvantageQuickbase
         xml = build_csv_xml( import_data, columns )
 
         result = send_request( :importFromCSV, db_id, nil, xml )
-        result.css('rid').map{ |xml_node| xml_node.text.to_i }
+        result = result.css('rid').map{ |xml_node| xml_node.text.to_i }
       end
 
       result
