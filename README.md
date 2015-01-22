@@ -58,6 +58,7 @@ num_records = qb_api.do_query_count( 'abcd1234', "{1.EX.'#{today}'}" )
 * `qname` - report or query name to load (should not be used with `query` or `qid`)
 * `clist` - a list (Array or period-separated string) of fields to return
 * `slist` - a list (Array or period-separated string) of fields to sort by
+* `fmt` - defaults to "structured"; use `fmt: ''` to set api responses to unstructured
 * `options` - string of additional options. ex: `"num-200.skp-#{records_processed}"`
 
 
