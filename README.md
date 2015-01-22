@@ -6,6 +6,8 @@ This gem is designed to be a concise, clear and maintainable collection of commo
 
 ##Example
 ```ruby
+require 'quickbase'
+
 # Create a new API connection
 qb_api = AdvantageQuickbase::API.new( 'domain', 'username', 'password' )
 
