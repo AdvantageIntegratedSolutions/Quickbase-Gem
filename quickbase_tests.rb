@@ -45,20 +45,22 @@ print "do_query_count: nil query... "
 result = quickbase.do_query_count( 'bcyfufihg', nil )
 puts result.inspect
 
-
-print "find:... "
-result = quickbase.find( 'bcyfufihg', 3)
-puts result.inspect
-
 print "do_query_count: basic query... "
 expected_records = quickbase.do_query_count( 'bcyfufihg', '{3.GTE."1000"}' )
 puts expected_records.inspect
 
 
+print "find:... "
+result = quickbase.find( 'bcyfufihg', 3 )
+puts result.inspect
+
+print "do_query: unstructured query... "
+result = quickbase.do_query( 'bcyfufihg', query: '{3.EX."1000"}', fmt: '' )
+puts result
+
 print "do_query: basic query... "
 result = quickbase.do_query( 'bcyfufihg', query: '{3.GTE."1000"}' )
 puts result.length == expected_records
-
 
 print "add_record... "
 new_record_id = quickbase.add_record( 'bhxa5rfap', {6 => "First Gem Record"} )
