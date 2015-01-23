@@ -70,7 +70,7 @@ module AdvantageQuickbase
 
     def do_query( db_id, options )
       # Define the query format
-      if options.has_key?( :fmt ) && options[:fmt].blank?
+      if options.has_key?( :fmt ) && options[:fmt].to_s.strip.empty?
         options.delete :fmt
       else
         options[ :fmt ] = 'structured'
