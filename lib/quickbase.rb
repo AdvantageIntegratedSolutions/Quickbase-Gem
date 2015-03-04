@@ -89,7 +89,14 @@ module AdvantageQuickbase
       result.css( 'record' ).each do |record|
         json_record = {}
         record.css( 'f' ).each do |field|
-          json_record[ field['id'] ] = field.text
+          if field.css("url").text != ""
+            fieldname = Nokogiri::XML.parse(field.to_html.gsub(/<url.*?<\/url>/, "")).text
+            value = { :filename => fieldname, :url => field.css("url").text }
+          else
+            value = field.text
+          end
+
+          json_record[ field['id'] ] = value
         end
 
         return_json << json_record
