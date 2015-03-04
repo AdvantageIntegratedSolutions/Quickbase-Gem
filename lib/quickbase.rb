@@ -70,7 +70,9 @@ module AdvantageQuickbase
 
     def do_query( db_id, options )
       # Define the query format
-      if !options[ :fmt ]
+      if options.has_key?( :fmt ) && options[:fmt].to_s.strip.empty?
+        options.delete :fmt
+      else
         options[ :fmt ] = 'structured'
       end
 
@@ -88,6 +90,7 @@ module AdvantageQuickbase
       return_json = []
       result.css( 'record' ).each do |record|
         json_record = {}
+
         record.css( 'f' ).each do |field|
           if field.css("url").text != ""
             fieldname = Nokogiri::XML.parse(field.to_html.gsub(/<url.*?<\/url>/, "")).text
@@ -96,7 +99,15 @@ module AdvantageQuickbase
             value = field.text
           end
 
-          json_record[ field['id'] ] = value
+          if options.has_key? :fmt
+            record.css( 'f' ).each do |field|
+              json_record[ field['id'] ] = value
+            end
+          else
+            record.element_children.each do |field|
+              json_record[ field.node_name ] = value
+            end
+          end
         end
 
         return_json << json_record
@@ -116,13 +127,13 @@ module AdvantageQuickbase
       xml = build_update_xml( new_values, record_id )
       result = send_request( :editRecord, db_id, nil, xml )
 
-      get_tag_value( result, :rid ).to_s == record_id.to_s
+      get_tag_value( result, :rid ).to_i > 0
     end
 
     def delete_record( db_id, record_id )
       result = send_request( :deleteRecord, db_id, {rid: record_id} )
 
-      get_tag_value( result, :rid ).to_s == record_id.to_s
+      get_tag_value( result, :rid ).to_i > 0
     end
 
     def purge_records ( db_id, options={} )
@@ -161,7 +172,7 @@ module AdvantageQuickbase
         xml = build_csv_xml( import_data, columns )
 
         result = send_request( :importFromCSV, db_id, nil, xml )
-        result.css('rid').map{ |xml_node| xml_node.text.to_i }
+        result = result.css('rid').map{ |xml_node| xml_node.text.to_i }
       end
 
       result
