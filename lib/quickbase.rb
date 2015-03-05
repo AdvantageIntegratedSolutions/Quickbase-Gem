@@ -92,17 +92,16 @@ module AdvantageQuickbase
         json_record = {}
 
         record.css( 'f' ).each do |field|
-          if field.css("url").text != ""
-            fieldname = Nokogiri::XML.parse(field.to_html.gsub(/<url.*?<\/url>/, "")).text
-            value = { :filename => fieldname, :url => field.css("url").text }
-          else
-            value = field.text
-          end
-
           if options.has_key? :fmt
-            record.css( 'f' ).each do |field|
-              json_record[ field['id'] ] = value
+            # File attachment fields shuold return a hash with keys :filename and :url
+            if !field.css("url").text.empty?
+              fieldname = Nokogiri::XML.parse(field.to_html.gsub(/<url.*?<\/url>/, "")).text
+              value = { filename: fieldname, url: field.css("url").text }
+            else
+              value = field.text
             end
+
+            json_record[ field['id'] ] = value
           else
             record.element_children.each do |field|
               json_record[ field.node_name ] = value
