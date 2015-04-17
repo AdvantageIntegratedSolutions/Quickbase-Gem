@@ -104,7 +104,7 @@ module AdvantageQuickbase
           end
         else
           record.element_children.each do |field|
-            json_record[ field.node_name ] = value
+            json_record[ field.node_name ] = field.text
           end
         end
 
