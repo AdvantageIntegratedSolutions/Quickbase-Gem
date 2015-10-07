@@ -304,13 +304,8 @@ module AdvantageQuickbase
 
     def build_request_xml( tags )
       xml = '<qdbapi>'
-<<<<<<< HEAD
       xml += tags.map{ |name, value| "<#{name}>#{value.to_s.encode(xml: :text)}</#{name}>" }.join()
-      xml += "<ticket>#{@ticket}</ticket>"
-=======
-      xml += tags.map{ |name, value| "<#{name}>#{value}</#{name}>" }.join()
       xml += ticket_and_token
->>>>>>> e6b8af56ba8af5511721300c697f19da827f6b12
       xml += '</qdbapi>'
     end
 
