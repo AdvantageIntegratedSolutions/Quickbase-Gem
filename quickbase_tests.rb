@@ -47,7 +47,7 @@ puts result.inspect
 
 
 print "do_query_count: basic query... "
-expected_records = quickbase.do_query_count( 'bcyfufihg', '{3.GTE."1000"}' )
+expected_records = quickbase.do_query_count( 'bcyfufihg', '{182.GTE."1000"}' )
 puts expected_records.inspect
 
 
