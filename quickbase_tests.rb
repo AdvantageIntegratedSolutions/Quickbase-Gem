@@ -45,16 +45,22 @@ print "do_query_count: nil query... "
 result = quickbase.do_query_count( 'bcyfufihg', nil )
 puts result.inspect
 
-
 print "do_query_count: basic query... "
 expected_records = quickbase.do_query_count( 'bcyfufihg', '{182.GTE."1000"}' )
 puts expected_records.inspect
 
 
+print "find:... "
+result = quickbase.find( 'bcyfufihg', 3 )
+puts result.inspect
+
+print "do_query: unstructured query... "
+result = quickbase.do_query( 'bcyfufihg', query: '{3.EX."1000"}', fmt: '' )
+puts result
+
 print "do_query: basic query... "
 result = quickbase.do_query( 'bcyfufihg', query: '{3.GTE."1000"}' )
 puts result.length == expected_records
-
 
 print "add_record... "
 new_record_id = quickbase.add_record( 'bhxa5rfap', {6 => "First Gem Record"} )
@@ -70,6 +76,14 @@ puts result
 
 print "import_from_csv... "
 new_records = quickbase.import_from_csv( 'bhxa5rfap', [["CSV Import 1"], ["CSV Import 2"]], [6] )
+puts new_records.inspect
+
+print "import_from_csv with a hash... "
+new_records = quickbase.import_from_csv( 'bhxa5rfap', [{6 => "CSV Import 1"}, {6 => ["CSV Import 2"]}] )
+puts new_records.inspect
+
+print "import_from_csv with empty data... "
+new_records = quickbase.import_from_csv( 'bhxa5rfap', [] )
 puts new_records.inspect
 
 print "purge records... "
@@ -151,5 +165,3 @@ puts result
 puts "remove_access"
 result = quickbase.remove_access("bixwcdpqw", "kithensel@gmail.com")
 puts result
-
-

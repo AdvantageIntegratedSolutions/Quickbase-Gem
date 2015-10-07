@@ -1,4 +1,4 @@
-#Ruby Quickbase Gem for Humans
+#AIS QuickBase Ruby Gem
 
 [![Gem Version](https://badge.fury.io/rb/advantage_quickbase.svg)](http://badge.fury.io/rb/advantage_quickbase)
 
@@ -6,6 +6,8 @@ This gem is designed to be a concise, clear and maintainable collection of commo
 
 ##Example
 ```ruby
+require 'quickbase'
+
 # Create a new API connection
 qb_api = AdvantageQuickbase::API.new( 'domain', 'username', 'password' )
 
@@ -23,6 +25,23 @@ puts books.inspect
 ```ruby
 qb_api = Advantage::QuickbaseAPI.new( :app_domain, :username, :password )
 ```
+###Find
+**find(db\_id, record\_id, query\_options)** => **[json] record**
+
+`query_options` expects a hash containing any (or none) of the following options:
+
+* `clist` - a list (Array or period-separated string) of fields to return
+* `fmt` - defaults to "structured"; use `fmt: ''` to set api responses to unstructured
+
+
+```ruby
+#Load the record that has a Record ID 8 from the books table
+book = qb_api.find( 'books_db_id', 8, clist: [3, 7] )
+
+puts book.inspect
+# => {"3" => "8", "7" =>"The Giver"}
+```
+
 
 ###Do Query Count
 **do\_query\_count( db_id, query=nil )** => **[int] Record Count**
@@ -35,13 +54,14 @@ num_records = qb_api.do_query_count( 'abcd1234', "{1.EX.'#{today}'}" )
 ###Do Query
 **do\_query( db\_id, query\_options )** => **[json] records**
 
-`query_options` expects a hash containing any of the following options:
+`query_options` expects a hash containing any (or none) of the following options:
 
 * `query` - typical Quickbase query string. ex: `"{3.EX.'123'}"`
 * `qid` - report or query id to load (should not be used with `query` or `qname`)
 * `qname` - report or query name to load (should not be used with `query` or `qid`)
 * `clist` - a list (Array or period-separated string) of fields to return
 * `slist` - a list (Array or period-separated string) of fields to sort by
+* `fmt` - defaults to "structured"; use `fmt: ''` to set api responses to unstructured
 * `options` - string of additional options. ex: `"num-200.skp-#{records_processed}"`
 
 
@@ -86,6 +106,16 @@ call_successful = qb_api.delete_record( 'abcd1234', 136 )
 records_deleted = qb_api.purge_records( 'abcd1234', {qid: 6} )
 ````
 
+###Get Schema
+Get the complete schema of the whole quickbase app
+
+
+**get_schema( db_id )**
+
+```ruby
+app_schema = qb_api.get_schema( 'abcd1234' )
+````
+
 ###Import From CSV
 **import\_from\_csv( db\_id, data, column\_field\_ids )** => **[json] New Record Ids**
 
@@ -96,4 +126,20 @@ new_data = [
   ['Book', 'Animal Farm', 'George Orwell']
 ]
 record_ids = qb_api.import_from_csv( 'abcd1234', new_data, [6, 7, 8] )
+````
+
+
+###Create App Token
+Create an app token that gives you access to that Quickbase app
+
+
+**create\_app\_token(db\_id, description, page\_token)**
+
+* `db_id` - database id
+* `description` - description of what the token is for
+* `page_token` - token hidden in the page DOM
+
+
+```ruby
+app_token = qb_api.create_app_token( 'abcd1234', 'Access all the books in the database', 'TugHxxkil9t6Kdebac' )
 ````

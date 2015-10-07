@@ -22,6 +22,13 @@ module AdvantageQuickbase
         }
       end
 
+      def get_key(db_id)
+        result = send_request( :doQuery, db_id, { :options => "num-1", :fmt => "structured" } )
+        
+        table = result.css('table')
+        key = get_tag_value(table, :key_fid) || "3"
+      end
+
       def get_role_info(db_id)
         roles = []
         result = send_request( :GetRoleInfo, db_id, {})

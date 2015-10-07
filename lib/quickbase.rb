@@ -10,13 +10,14 @@ require_relative 'table'
 module AdvantageQuickbase
   class API
 
-    attr_accessor :ticket
+    attr_accessor :ticket, :app_token
 
     include User
     include Table
 
     def initialize( domain, username, password, app_token=nil, ticket=nil)
       @domain = domain
+      @app_token = app_token if app_token
 
       if username && password #authenticate with username/password
         data = {
@@ -26,12 +27,14 @@ module AdvantageQuickbase
         }
       else #authenticate with existing ticket
         @ticket = ticket if ticket
+
         data = {}
       end
 
       request_xml = build_request_xml( data )
 
       @http = Net::HTTP.new( base_domain, 443 )
+      @http.read_timeout = 360
       @http.use_ssl = true
       @http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
@@ -54,9 +57,22 @@ module AdvantageQuickbase
       get_tag_value( result, :nummatches ).to_i
     end
 
+    def find( db_id, rid, options={} )
+      options[:query] = "{'3'.EX.'#{rid}'}"
+      records = self.do_query( db_id, options )
+
+      if records.length > 0
+        return records.first
+      else
+        return {}
+      end
+    end
+
     def do_query( db_id, options )
       # Define the query format
-      if !options[ :fmt ]
+      if options.has_key?( :fmt ) && options[:fmt].to_s.strip.empty?
+        options.delete :fmt
+      else
         options[ :fmt ] = 'structured'
       end
 
@@ -64,8 +80,8 @@ module AdvantageQuickbase
       options[ :clist ] = normalize_list( options[:clist] )
       options[ :slist ] = normalize_list( options[:slist] )
 
-      # Empty clist now loads all columns instead of "default"
-      if options[ :clist ].to_s.empty?
+      # nil clist loads all columns instead of "default"
+      if options[ :clist ].nil?
         options[ :clist ] = 'a'
       end
 
@@ -74,8 +90,23 @@ module AdvantageQuickbase
       return_json = []
       result.css( 'record' ).each do |record|
         json_record = {}
+
         record.css( 'f' ).each do |field|
-          json_record[ field['id'] ] = field.text
+          if options.has_key? :fmt
+            # File attachment fields shuold return a hash with keys :filename and :url
+            if !field.css("url").text.empty?
+              fieldname = Nokogiri::XML.parse(field.to_html.gsub(/<url.*?<\/url>/, "")).text
+              value = { filename: fieldname, url: field.css("url").text }
+            else
+              value = field.text
+            end
+
+            json_record[ field['id'] ] = value
+          else
+            record.element_children.each do |field|
+              json_record[ field.node_name ] = value
+            end
+          end
         end
 
         return_json << json_record
@@ -95,13 +126,13 @@ module AdvantageQuickbase
       xml = build_update_xml( new_values, record_id )
       result = send_request( :editRecord, db_id, nil, xml )
 
-      get_tag_value( result, :rid ).to_s == record_id.to_s
+      get_tag_value( result, :rid ).to_i > 0
     end
 
     def delete_record( db_id, record_id )
       result = send_request( :deleteRecord, db_id, {rid: record_id} )
 
-      get_tag_value( result, :rid ).to_s == record_id.to_s
+      get_tag_value( result, :rid ).to_i > 0
     end
 
     def purge_records ( db_id, options={} )
@@ -114,12 +145,36 @@ module AdvantageQuickbase
       get_tag_value( result, :num_records_deleted ).to_s
     end
 
-    def import_from_csv( db_id, data_array, columns )
-      columns = normalize_list( columns )
-      xml = build_csv_xml( data_array, columns )
+    def create_app_token(db_id, description, page_token)
+      url = "https://#{base_domain}/db/main?a=QBI_CreateDeveloperKey"
 
-      result = send_request( :importFromCSV, db_id, nil, xml )
-      result.css('rid').map{ |xml_node| xml_node.text.to_i }
+      result = send_quickbase_ui_action(url)
+      result = parse_xml( result.body )
+
+      app_token = get_tag_value(result, "devkey")
+
+      url = URI::encode("https://#{base_domain}/db/#{db_id}?a=QBI_AddApplicationDeveloperKey&devKey=#{app_token}&keydescription=#{description}&keyType=P&PageToken=#{page_token}")
+
+      result = send_quickbase_ui_action(url)
+      result = parse_xml( result.body )
+
+      app_token
+    end
+
+    def import_from_csv( db_id, import_data, columns=nil )
+      result = []
+      if import_data && import_data.length > 0
+        # If import_data contains hashes, use the keys as the import headers
+        columns ||= import_data[ 0 ].map{ |fid, value| fid }
+        columns = normalize_list( columns )
+
+        xml = build_csv_xml( import_data, columns )
+
+        result = send_request( :importFromCSV, db_id, nil, xml )
+        result = result.css('rid').map{ |xml_node| xml_node.text.to_i }
+      end
+
+      result
     end
 
     def get_schema( db_id )
@@ -155,7 +210,9 @@ module AdvantageQuickbase
 
         # Parse the field data
         schema_hash[ :fields ] = {}
+
         fields = result.css( 'field' )
+
         fields.each do |field|
           field_hash = {
             id: field.attributes[ 'id' ].to_s,
@@ -185,6 +242,22 @@ module AdvantageQuickbase
           end
 
           schema_hash[ :fields ][ field_hash[:id] ] = field_hash
+        end
+
+        #Parse the report data
+        schema_hash[ :reports ] = {}
+        reports = result.css( 'query' )
+        reports.each do |report|
+          report_hash = {
+            id: report.attributes[ 'id' ].to_s,
+            name: get_tag_value( report, 'qyname' ),
+            type: get_tag_value( report, 'qytype' ),
+            criteria: get_tag_value( report, 'qycrit' ),
+            clist: get_tag_value( report, 'qyclst' ),
+            slist: get_tag_value( report, 'qyslst' )
+          }
+
+          schema_hash[ :reports ][ report_hash[:id] ] = report_hash
         end
       end
 
@@ -231,8 +304,13 @@ module AdvantageQuickbase
 
     def build_request_xml( tags )
       xml = '<qdbapi>'
+<<<<<<< HEAD
       xml += tags.map{ |name, value| "<#{name}>#{value.to_s.encode(xml: :text)}</#{name}>" }.join()
       xml += "<ticket>#{@ticket}</ticket>"
+=======
+      xml += tags.map{ |name, value| "<#{name}>#{value}</#{name}>" }.join()
+      xml += ticket_and_token
+>>>>>>> e6b8af56ba8af5511721300c697f19da827f6b12
       xml += '</qdbapi>'
     end
 
@@ -253,7 +331,7 @@ module AdvantageQuickbase
       end
 
       xml += new_values.join()
-      xml += "<ticket>#{@ticket}</ticket>"
+      xml += ticket_and_token
       xml += '</qdbapi>'
     end
 
@@ -269,13 +347,27 @@ module AdvantageQuickbase
     end
 
     def build_csv_xml( new_values, fields_to_import )
+      csv_data = []
+      new_values.each do |line|
+        if line.is_a?( Array )
+          csv_data << CSV.generate_line( line )
+        elsif line.is_a?( Hash )
+          csv_data << CSV.generate_line( line.map{ |k, v| v } )
+        end
+      end
+
       xml = '<qdbapi>'
       xml += "<records_csv><![CDATA[\n"
-      xml += new_values.map{ |line| CSV.generate_line(line) }.join()
+      xml += csv_data.join()
       xml += "]]></records_csv>"
       xml += "<clist>#{fields_to_import}</clist>"
-      xml += "<ticket>#{@ticket}</ticket>"
+      xml += ticket_and_token
       xml += '</qdbapi>'
+    end
+
+    def ticket_and_token
+      "<ticket>#{@ticket}</ticket>" +
+      "<apptoken>#{@app_token}</apptoken>"
     end
 
     def parse_xml( xml )
@@ -287,7 +379,7 @@ module AdvantageQuickbase
 
       tag_value = nil
       if !tag.empty?
-        tag_value = tag.text
+        tag_value = tag[ 0 ].text
       end
 
       tag_value
@@ -315,7 +407,6 @@ module AdvantageQuickbase
 
       url = build_request_url( api_call, db_id )
       headers = build_request_headers( api_call, request_xml )
-
       result = @http.post( url, request_xml, headers )
 
       xml_result = parse_xml( result.body )
