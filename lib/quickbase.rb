@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'json'
 require 'csv'
 require 'base64'
+require 'pry'
 
 require_relative 'user'
 require_relative 'table'
@@ -113,6 +114,17 @@ module AdvantageQuickbase
       end
 
       return_json
+    end
+
+    def get_db_var( app_id, variable_name )
+    	result = send_request( :GetDBVar, app_id, { varname: variable_name } )
+
+    	get_tag_value( result, :value )
+    end
+
+    def set_db_var( app_id, variable_name, value=nil )
+    	send_request( :SetDBVar, app_id, { varname: variable_name, value: value } )
+    	true
     end
 
     def add_record( db_id, new_values )
@@ -403,6 +415,7 @@ module AdvantageQuickbase
       url = build_request_url( api_call, db_id )
       headers = build_request_headers( api_call, request_xml )
       result = @http.post( url, request_xml, headers )
+			puts result
 
       xml_result = parse_xml( result.body )
 

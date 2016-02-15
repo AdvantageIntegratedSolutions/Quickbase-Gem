@@ -1,11 +1,9 @@
 #! /usr/bin/env ruby
 
-
 # README
 # To use, create a config/credentials.yml file with 2 lines:
 #  username: your_username
 #  password: your_password
-
 
 require 'yaml'
 # require 'quickbase'
@@ -16,8 +14,14 @@ login_info = YAML.load_file( 'config/credentials.yml' )
 puts login_info.inspect
 
 print "Connect to Quickbase... "
-quickbase = AdvantageQuickbase::API.new( 'ais', login_info['username'], login_info['password'] )
+quickbase = AdvantageQuickbase::API.new( 'ais', login_info['username'], login_info['password'])
 puts "complete."
+
+puts "set_db_var"
+puts quickbase.set_db_var('bcyfufihg', 'Test', 'This is a test')
+
+puts "get_db_var"
+puts quickbase.get_db_var('bcyfufihg', 'Test')
 
 puts "get_schema  Table ... "
 result = quickbase.get_schema( 'bcyfufihg' )
