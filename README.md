@@ -42,6 +42,17 @@ puts book.inspect
 # => {"3" => "8", "7" =>"The Giver"}
 ```
 
+###Get DB Var
+**get\_db\_var( app_id, variable_name )** => **[string] Variable Value**
+```ruby
+value = qb_api.get_db_var( 'abcd1234', 'test' )
+````
+
+###Set DB Var
+**set\_db\_var( app_id, variable_name, value=nil )** => **[bool] Success?**
+```ruby
+qb_api.set_db_var( 'abcd1234', 'test', 'value' )
+````
 
 ###Do Query Count
 **do\_query\_count( db_id, query=nil )** => **[int] Record Count**
