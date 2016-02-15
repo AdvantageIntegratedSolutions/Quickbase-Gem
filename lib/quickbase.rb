@@ -3,7 +3,6 @@ require 'nokogiri'
 require 'json'
 require 'csv'
 require 'base64'
-require 'pry'
 
 require_relative 'user'
 require_relative 'table'
