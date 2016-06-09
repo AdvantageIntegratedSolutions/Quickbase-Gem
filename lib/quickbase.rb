@@ -414,7 +414,8 @@ module AdvantageQuickbase
       url = build_request_url( api_call, db_id )
       headers = build_request_headers( api_call, request_xml )
       result = @http.post( url, request_xml, headers )
-			puts result
+      # Raise Net::HTTPServerException if HTTP code is not 200
+      result.value
 
       xml_result = parse_xml( result.body )
 
