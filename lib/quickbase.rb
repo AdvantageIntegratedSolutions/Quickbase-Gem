@@ -15,33 +15,22 @@ module AdvantageQuickbase
     include User
     include Table
 
-    def initialize(authentication)
+    def initialize( domain, username, password, app_token=nil, ticket=nil, user_token=nil)
+      @domain = domain
+      @app_token = app_token if app_token
 
-      # authentication =>
-      #  :domain
-      #  :username
-      #  :password
-      #  :app_token
-      #  :ticket
-      #  :user_token
-
-      puts authentication
-
-      @domain = authentication[:domain]
-      @app_token = authentication[:app_token] if authentication[:app_token]
-
-      if authentication[:username] && authentication[:password]
+      if username && password #authenticate with username/password
         data = {
-          username: authentication[:username],
-          password: authentication[:password],
-          apptoken: authentication[:app_token]
+          username: username,
+          password: password,
+          apptoken: app_token
         }
-      elsif authentication[:ticket]
-        @ticket = authentication[:ticket] if authentication[:ticket]
+      elsif ticket #authenticate with existing ticket
+        @ticket = ticket if ticket
 
         data = {}
-      elsif authentication[:user_token]
-        @user_token = authentication[:user_token]
+      elsif user_token
+        @user_token = user_token
 
         data = {}
       end
