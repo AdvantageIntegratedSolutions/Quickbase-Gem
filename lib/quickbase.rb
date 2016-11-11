@@ -10,23 +10,38 @@ require_relative 'table'
 module AdvantageQuickbase
   class API
 
-    attr_accessor :ticket, :app_token
+    attr_accessor :ticket, :app_token, :user_token
 
     include User
     include Table
 
-    def initialize( domain, username, password, app_token=nil, ticket=nil)
-      @domain = domain
-      @app_token = app_token if app_token
+    def initialize(authentication)
 
-      if username && password #authenticate with username/password
+      # authentication =>
+      #  :domain
+      #  :username
+      #  :password
+      #  :app_token
+      #  :ticket
+      #  :user_token
+
+      puts authentication
+
+      @domain = authentication[:domain]
+      @app_token = authentication[:app_token] if authentication[:app_token]
+
+      if authentication[:username] && authentication[:password]
         data = {
-          username: username,
-          password: password,
-          apptoken: app_token
+          username: authentication[:username],
+          password: authentication[:password],
+          apptoken: authentication[:app_token]
         }
-      else #authenticate with existing ticket
-        @ticket = ticket if ticket
+      elsif authentication[:ticket]
+        @ticket = authentication[:ticket] if authentication[:ticket]
+
+        data = {}
+      elsif authentication[:user_token]
+        @user_token = authentication[:user_token]
 
         data = {}
       end
@@ -44,11 +59,13 @@ module AdvantageQuickbase
       result = @http.post( url, request_xml, headers )
       parsed_result = parse_xml( result.body )
 
-      ticket = get_tag_value( parsed_result, :ticket )
-      if ticket
-        @ticket = ticket
-      else
-        raise "Connection Failed\n\n#{result.body}"
+      if !@user_token
+        ticket = get_tag_value( parsed_result, :ticket )
+        if ticket
+          @ticket = ticket
+        else
+          raise "Connection Failed\n\n#{result.body}"
+        end
       end
     end
 
@@ -372,8 +389,13 @@ module AdvantageQuickbase
     end
 
     def ticket_and_token
-      "<ticket>#{@ticket}</ticket>" +
-      "<apptoken>#{@app_token}</apptoken>"
+      if @user_token
+        "<usertoken>#{@user_token}</usertoken>" +
+        "<apptoken>#{@app_token}</apptoken>"
+      else
+        "<ticket>#{@ticket}</ticket>" +
+        "<apptoken>#{@app_token}</apptoken>"
+      end
     end
 
     def parse_xml( xml )
@@ -414,7 +436,6 @@ module AdvantageQuickbase
       url = build_request_url( api_call, db_id )
       headers = build_request_headers( api_call, request_xml )
       result = @http.post( url, request_xml, headers )
-			puts result
 
       xml_result = parse_xml( result.body )
 
