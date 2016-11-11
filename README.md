@@ -9,16 +9,8 @@ This gem is designed to be a concise, clear and maintainable collection of commo
 require 'quickbase'
 
 # Create a new API connection
-auth = {
-  :username => "",
-  :password => "",
-  :domain => "",
-  :ticket => "",
-  :app_token => "",
-  :user_token => ""
-}
 
-qb_api = AdvantageQuickbase::API.new( auth )
+qb_api = AdvantageQuickbase::API.new( domain, username, password, app_token, ticket, user_token )
 
 # Load all of the Books in our table
 query_options = { query: "{6.EX.'Book'}", clist: [7] }
@@ -32,7 +24,7 @@ puts books.inspect
 ###New Connection
 
 ```ruby
-qb_api = Advantage::QuickbaseAPI.new( auth )
+qb_api = Advantage::QuickbaseAPI.new( domain, username, password, app_token, ticket, user_token )
 ```
 ###Find
 **find(db\_id, record\_id, query\_options)** => **[json] record**
