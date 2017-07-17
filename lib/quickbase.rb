@@ -335,7 +335,8 @@ module AdvantageQuickbase
       new_values = new_values.map do |field_id, value|
         # Values that are hashes with name and file are encoded seperately
         if value.is_a?( Hash ) && value.length == 2 && value[:name] && value[:file]
-          file = encode_file( value[:file] )
+          file = !value[:bypass_encoding] ? encode_file( value[:file] ) || value[:file]
+
           "<field fid='#{field_id}' filename='#{value[:name]}'>#{file}</field>"
         else
           "<field fid='#{field_id}'>#{value.to_s.encode(xml: :text)}</field>"
