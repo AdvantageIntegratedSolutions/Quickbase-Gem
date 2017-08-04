@@ -221,6 +221,14 @@ module AdvantageQuickbase
 
           schema_hash[ :tables ][ table_hash[:dbid] ] = table_hash
         end
+
+        # Add Application Variables
+        schema_hash[ :variables ] = {}
+        vars = result.css( 'var' )
+        vars.each do |var|
+          name = var.attributes['name'].to_s
+          schema_hash[ :variables ][name] = var.text
+        end
       else
         # Table mode
         schema_hash[ :mode ] = 'table'
@@ -335,8 +343,7 @@ module AdvantageQuickbase
       new_values = new_values.map do |field_id, value|
         # Values that are hashes with name and file are encoded seperately
         if value.is_a?( Hash ) && value.length == 2 && value[:name] && value[:file]
-          file = !value[:bypass_encoding] ? encode_file( value[:file] ) || value[:file]
-
+          file = !value[:bypass_encoding] ? encode_file( value[:file] ) : value[:file]
           "<field fid='#{field_id}' filename='#{value[:name]}'>#{file}</field>"
         else
           "<field fid='#{field_id}'>#{value.to_s.encode(xml: :text)}</field>"
