@@ -10,12 +10,12 @@ require_relative 'table'
 module AdvantageQuickbase
   class API
 
-    attr_accessor :ticket, :app_token
+    attr_accessor :ticket, :app_token, :user_token
 
     include User
     include Table
 
-    def initialize( domain, username, password, app_token=nil, ticket=nil)
+    def initialize( domain, username, password, app_token=nil, ticket=nil, user_token=nil)
       @domain = domain
       @app_token = app_token if app_token
 
@@ -25,8 +25,12 @@ module AdvantageQuickbase
           password: password,
           apptoken: app_token
         }
-      else #authenticate with existing ticket
+      elsif ticket #authenticate with existing ticket
         @ticket = ticket if ticket
+
+        data = {}
+      elsif user_token
+        @user_token = user_token
 
         data = {}
       end
@@ -44,11 +48,13 @@ module AdvantageQuickbase
       result = @http.post( url, request_xml, headers )
       parsed_result = parse_xml( result.body )
 
-      ticket = get_tag_value( parsed_result, :ticket )
-      if ticket
-        @ticket = ticket
-      else
-        raise "Connection Failed\n\n#{result.body}"
+      if !@user_token
+        ticket = get_tag_value( parsed_result, :ticket )
+        if ticket
+          @ticket = ticket
+        else
+          raise "Connection Failed\n\n#{result.body}"
+        end
       end
     end
 
@@ -329,7 +335,8 @@ module AdvantageQuickbase
       new_values = new_values.map do |field_id, value|
         # Values that are hashes with name and file are encoded seperately
         if value.is_a?( Hash ) && value.length == 2 && value[:name] && value[:file]
-          file = encode_file( value[:file] )
+          file = !value[:bypass_encoding] ? encode_file( value[:file] ) || value[:file]
+
           "<field fid='#{field_id}' filename='#{value[:name]}'>#{file}</field>"
         else
           "<field fid='#{field_id}'>#{value.to_s.encode(xml: :text)}</field>"
@@ -372,8 +379,13 @@ module AdvantageQuickbase
     end
 
     def ticket_and_token
-      "<ticket>#{@ticket}</ticket>" +
-      "<apptoken>#{@app_token}</apptoken>"
+      if @user_token
+        "<usertoken>#{@user_token}</usertoken>" +
+        "<apptoken>#{@app_token}</apptoken>"
+      else
+        "<ticket>#{@ticket}</ticket>" +
+        "<apptoken>#{@app_token}</apptoken>"
+      end
     end
 
     def parse_xml( xml )
