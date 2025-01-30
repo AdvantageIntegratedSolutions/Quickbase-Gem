@@ -337,7 +337,8 @@ module AdvantageQuickbase
     def build_update_xml( new_values, record_id=nil )
       xml = '<qdbapi>'
       if record_id
-        xml += "<key>#{record_id}</key>"
+        xml_enc_primary_key = record_id.to_s.encode(:xml => :text)
+        xml += "<key>#{xml_enc_primary_key}</key>"
       end
 
       new_values = new_values.map do |field_id, value|
